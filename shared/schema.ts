@@ -19,10 +19,11 @@ export type User = typeof users.$inferSelect;
 
 // Define custom type for metadata and references
 export type DocumentMetadata = Record<string, unknown>;
-export type MessageReference = {
+export type MessageReferenceItem = {
   text: string;
   location: string;
-}[];
+};
+export type MessageReference = MessageReferenceItem[];
 
 // Document schema
 export const documents = pgTable("documents", {
@@ -66,7 +67,7 @@ export const messages = pgTable("messages", {
   conversationId: integer("conversation_id").notNull(),
   content: text("content").notNull(),
   isUserMessage: boolean("is_user_message").notNull(),
-  references: jsonb("references").notNull().default({}),
+  references: jsonb("references").$type<MessageReference>().notNull().default([]),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -113,10 +114,7 @@ export type MessageWithReferences = {
   id: number;
   content: string;
   isUserMessage: boolean;
-  references?: {
-    text: string;
-    location: string;
-  }[];
+  references?: MessageReference;
   createdAt: string;
 };
 

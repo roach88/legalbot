@@ -3,7 +3,8 @@ import {
   documents, type Document, type InsertDocument,
   conversations, type Conversation, type InsertConversation,
   messages, type Message, type InsertMessage,
-  type ConversationWithMessages, type MessageWithReferences
+  type ConversationWithMessages, type MessageWithReferences,
+  type MessageReference
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
@@ -143,10 +144,14 @@ export class MemStorage implements IStorage {
   // Message methods
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
     const id = this.messageId++;
+    const references: MessageReference = Array.isArray(insertMessage.references) 
+      ? insertMessage.references as MessageReference 
+      : [];
+    
     const message: Message = {
       ...insertMessage,
       id,
-      references: insertMessage.references || {},
+      references,
       createdAt: new Date()
     };
     this.messages.set(id, message);
@@ -241,7 +246,18 @@ export class DatabaseStorage implements IStorage {
   
   // Message methods
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
-    const [message] = await db.insert(messages).values(insertMessage).returning();
+    const references: MessageReference = Array.isArray(insertMessage.references) 
+      ? insertMessage.references as MessageReference 
+      : [];
+    
+    const messageData = {
+      content: insertMessage.content,
+      conversationId: insertMessage.conversationId,
+      isUserMessage: insertMessage.isUserMessage,
+      references
+    };
+    
+    const [message] = await db.insert(messages).values(messageData).returning();
     return message;
   }
   
