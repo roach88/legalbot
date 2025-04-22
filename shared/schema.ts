@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, jsonb, timestamp, boolean } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -37,6 +38,10 @@ export const insertDocumentSchema = createInsertSchema(documents).pick({
 
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type Document = typeof documents.$inferSelect;
+
+export const documentsRelations = relations(documents, ({ many }) => ({
+  conversations: many(conversations),
+}));
 
 // Conversations schema
 export const conversations = pgTable("conversations", {

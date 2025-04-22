@@ -5,6 +5,8 @@ import {
   messages, type Message, type InsertMessage,
   type ConversationWithMessages, type MessageWithReferences
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -156,4 +158,98 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+  
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+  
+  // Document methods
+  async createDocument(insertDocument: InsertDocument): Promise<Document> {
+    const [document] = await db.insert(documents).values(insertDocument).returning();
+    return document;
+  }
+  
+  async getDocument(id: number): Promise<Document | undefined> {
+    const [document] = await db.select().from(documents).where(eq(documents.id, id));
+    return document;
+  }
+  
+  async getAllDocuments(): Promise<Document[]> {
+    return await db.select().from(documents).orderBy(desc(documents.uploadedAt));
+  }
+  
+  // Conversation methods
+  async createConversation(insertConversation: InsertConversation): Promise<Conversation> {
+    const [conversation] = await db.insert(conversations).values(insertConversation).returning();
+    return conversation;
+  }
+  
+  async getConversation(id: number): Promise<Conversation | undefined> {
+    const [conversation] = await db.select().from(conversations).where(eq(conversations.id, id));
+    return conversation;
+  }
+  
+  async getConversationsByDocumentId(documentId: number): Promise<Conversation[]> {
+    return await db.select()
+      .from(conversations)
+      .where(eq(conversations.documentId, documentId))
+      .orderBy(desc(conversations.createdAt));
+  }
+  
+  async getConversationWithMessages(id: number): Promise<ConversationWithMessages | undefined> {
+    const conversation = await this.getConversation(id);
+    if (!conversation) return undefined;
+    
+    const [document] = await db.select({
+      id: documents.id,
+      fileName: documents.fileName
+    })
+    .from(documents)
+    .where(eq(documents.id, conversation.documentId));
+    
+    if (!document) return undefined;
+    
+    const messagesRaw = await this.getMessagesByConversationId(id);
+    const messages: MessageWithReferences[] = messagesRaw.map(msg => ({
+      id: msg.id,
+      content: msg.content,
+      isUserMessage: msg.isUserMessage,
+      references: msg.references ? msg.references as any : undefined,
+      createdAt: msg.createdAt.toISOString()
+    }));
+    
+    return {
+      id: conversation.id,
+      document,
+      messages
+    };
+  }
+  
+  // Message methods
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const [message] = await db.insert(messages).values(insertMessage).returning();
+    return message;
+  }
+  
+  async getMessagesByConversationId(conversationId: number): Promise<Message[]> {
+    return await db.select()
+      .from(messages)
+      .where(eq(messages.conversationId, conversationId))
+      .orderBy(messages.id);
+  }
+}
+
+// Use the database storage implementation
+export const storage = new DatabaseStorage();
