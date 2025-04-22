@@ -17,6 +17,13 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+// Define custom type for metadata and references
+export type DocumentMetadata = Record<string, unknown>;
+export type MessageReference = {
+  text: string;
+  location: string;
+}[];
+
 // Document schema
 export const documents = pgTable("documents", {
   id: serial("id").primaryKey(),
@@ -24,7 +31,7 @@ export const documents = pgTable("documents", {
   fileType: text("file_type").notNull(),
   fileSize: integer("file_size").notNull(),
   content: text("content").notNull(),
-  metadata: jsonb("metadata"),
+  metadata: jsonb("metadata").$type<DocumentMetadata>().notNull().default({}),
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
 });
 
@@ -38,10 +45,6 @@ export const insertDocumentSchema = createInsertSchema(documents).pick({
 
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type Document = typeof documents.$inferSelect;
-
-export const documentsRelations = relations(documents, ({ many }) => ({
-  conversations: many(conversations),
-}));
 
 // Conversations schema
 export const conversations = pgTable("conversations", {
@@ -63,7 +66,7 @@ export const messages = pgTable("messages", {
   conversationId: integer("conversation_id").notNull(),
   content: text("content").notNull(),
   isUserMessage: boolean("is_user_message").notNull(),
-  references: jsonb("references"),
+  references: jsonb("references").notNull().default({}),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -76,6 +79,26 @@ export const insertMessageSchema = createInsertSchema(messages).pick({
 
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
+
+// Define relations between tables
+export const documentsRelations = relations(documents, ({ many }) => ({
+  conversations: many(conversations)
+}));
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  document: one(documents, {
+    fields: [conversations.documentId],
+    references: [documents.id]
+  }),
+  messages: many(messages)
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [messages.conversationId],
+    references: [conversations.id]
+  })
+}));
 
 // Dto types for API responses
 export type DocumentUploadResponse = {

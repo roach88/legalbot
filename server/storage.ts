@@ -76,7 +76,8 @@ export class MemStorage implements IStorage {
     const id = this.documentId++;
     const document: Document = { 
       ...insertDocument, 
-      id, 
+      id,
+      metadata: insertDocument.metadata || {},
       uploadedAt: new Date()
     };
     this.documents.set(id, document);
@@ -145,6 +146,7 @@ export class MemStorage implements IStorage {
     const message: Message = {
       ...insertMessage,
       id,
+      references: insertMessage.references || {},
       createdAt: new Date()
     };
     this.messages.set(id, message);
