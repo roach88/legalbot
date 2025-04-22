@@ -100,31 +100,31 @@ export default function DocumentUpload({ onDocumentUpload }: DocumentUploadProps
   });
   
   return (
-    <div id="empty-state" className="flex flex-col items-center justify-center h-full p-8 text-center">
-      <div className="bg-primary-50 rounded-full p-6 mb-6">
-        <span className="material-icons text-5xl text-primary-500">upload_file</span>
+    <div id="empty-state" className="flex flex-col items-center justify-center h-full p-lg text-center">
+      <div className="bg-primary/10 rounded-full p-md mb-md">
+        <span className="material-icons text-5xl text-primary">upload_file</span>
       </div>
-      <h3 className="text-lg font-medium text-neutral-700 mb-2">No Document Loaded</h3>
-      <p className="text-neutral-500 mb-6 max-w-md">
+      <h3 className="text-h3 font-semibold text-foreground mb-sm">No Document Loaded</h3>
+      <p className="text-body text-muted-foreground mb-md max-w-md">
         Upload a legal document to begin analyzing it with AI. Supported formats include PDF, DOCX, and TXT.
       </p>
       
       <div 
         {...getRootProps()} 
         className={`border-2 border-dashed ${
-          isDragActive ? 'border-primary-300 bg-neutral-50' : 'border-neutral-200'
-        } rounded-lg p-8 w-full max-w-md cursor-pointer hover:bg-neutral-50 transition-colors`}
+          isDragActive ? 'border-secondary bg-background' : 'border-border'
+        } rounded-[var(--radius-card)] p-lg w-full max-w-md cursor-pointer hover:bg-background hover:shadow-hover transition-all duration-300`}
       >
         <input {...getInputProps()} />
         <div className="flex flex-col items-center">
-          <span className="material-icons text-3xl text-neutral-300 mb-2">cloud_upload</span>
-          <p className="font-medium text-neutral-600">
+          <span className="material-icons text-4xl text-muted mb-sm">cloud_upload</span>
+          <p className="font-semibold text-body text-foreground">
             {uploading 
               ? 'Uploading...' 
-              : <>Drag documents here or <span className="text-primary-500">browse</span></>
+              : <>Drag documents here or <span className="text-secondary hover:text-accent transition-colors duration-300">browse</span></>
             }
           </p>
-          <p className="text-sm text-neutral-400 mt-1">Maximum file size: 10MB</p>
+          <p className="text-caption text-muted-foreground mt-xs">Maximum file size: 10MB</p>
         </div>
       </div>
     </div>

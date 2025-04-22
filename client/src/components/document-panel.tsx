@@ -10,20 +10,20 @@ interface DocumentPanelProps {
 
 export default function DocumentPanel({ document, onDocumentUpload }: DocumentPanelProps) {
   return (
-    <div className="document-panel w-full md:w-1/2 flex flex-col rounded-lg bg-white shadow-md overflow-hidden h-[calc(100vh-160px)] md:h-auto">
-      <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
-        <h2 className="font-medium text-neutral-700">Document View</h2>
-        <div className="flex items-center space-x-2">
-          <button className="text-neutral-700 hover:text-primary-500">
-            <span className="material-icons text-sm">search</span>
+    <div className="document-panel w-full md:w-1/2 flex flex-col rounded-[var(--radius-card)] bg-card shadow-card overflow-hidden h-[calc(100vh-160px)] md:h-auto transition-all duration-300 hover:shadow-hover">
+      <div className="flex items-center justify-between border-b border-border px-md py-sm">
+        <h2 className="font-semibold text-h3 text-foreground">Document View</h2>
+        <div className="flex items-center space-x-sm">
+          <button className="text-muted-foreground hover:text-secondary transition-colors duration-300">
+            <span className="material-icons text-xl">search</span>
           </button>
           {document && (
-            <button className="text-neutral-700 hover:text-primary-500">
-              <span className="material-icons text-sm">download</span>
+            <button className="text-muted-foreground hover:text-secondary transition-colors duration-300">
+              <span className="material-icons text-xl">download</span>
             </button>
           )}
-          <button className="text-neutral-700 hover:text-primary-500">
-            <span className="material-icons text-sm">more_vert</span>
+          <button className="text-muted-foreground hover:text-secondary transition-colors duration-300">
+            <span className="material-icons text-xl">more_vert</span>
           </button>
         </div>
       </div>
