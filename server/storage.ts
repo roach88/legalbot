@@ -144,16 +144,22 @@ export class MemStorage implements IStorage {
   // Message methods
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
     const id = this.messageId++;
-    const references: MessageReference = Array.isArray(insertMessage.references) 
-      ? insertMessage.references as MessageReference 
-      : [];
+    
+    // Ensure references is a valid array
+    let messageReferences: MessageReference = [];
+    if (insertMessage.references && Array.isArray(insertMessage.references)) {
+      messageReferences = insertMessage.references as MessageReference;
+    }
     
     const message: Message = {
-      ...insertMessage,
+      content: insertMessage.content,
+      conversationId: insertMessage.conversationId,
+      isUserMessage: insertMessage.isUserMessage,
       id,
-      references,
+      references: messageReferences,
       createdAt: new Date()
     };
+    
     this.messages.set(id, message);
     return message;
   }
@@ -233,7 +239,7 @@ export class DatabaseStorage implements IStorage {
       id: msg.id,
       content: msg.content,
       isUserMessage: msg.isUserMessage,
-      references: msg.references ? msg.references as any : undefined,
+      references: msg.references,
       createdAt: msg.createdAt.toISOString()
     }));
     
@@ -246,17 +252,21 @@ export class DatabaseStorage implements IStorage {
   
   // Message methods
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
-    const references: MessageReference = Array.isArray(insertMessage.references) 
-      ? insertMessage.references as MessageReference 
-      : [];
+    // Ensure references is a valid array
+    let messageReferences: MessageReference = [];
+    if (insertMessage.references && Array.isArray(insertMessage.references)) {
+      messageReferences = insertMessage.references as MessageReference;
+    }
     
+    // Create a clean message object without any type issues
     const messageData = {
       content: insertMessage.content,
       conversationId: insertMessage.conversationId,
       isUserMessage: insertMessage.isUserMessage,
-      references
+      references: messageReferences
     };
     
+    // Insert the message into the database
     const [message] = await db.insert(messages).values(messageData).returning();
     return message;
   }
