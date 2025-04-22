@@ -80,7 +80,7 @@ export default function DocumentUpload({ onDocumentUpload }: DocumentUploadProps
     } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to upload document',
+        description: error instanceof Error ? error.message : 'Failed to upload document',
         variant: 'destructive',
       });
     } finally {

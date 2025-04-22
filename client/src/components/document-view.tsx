@@ -49,9 +49,9 @@ export default function DocumentView({ document }: DocumentViewProps) {
   
   if (isLoading) {
     return (
-      <div className="p-6">
-        <Skeleton className="h-8 w-3/4 mb-2" />
-        <div className="flex items-center space-x-2 mb-6">
+      <div className="p-md">
+        <Skeleton className="h-8 w-3/4 mb-sm" />
+        <div className="flex items-center space-x-xs mb-md">
           <Skeleton className="h-4 w-20" />
           <Skeleton className="h-4 w-4 rounded-full" />
           <Skeleton className="h-4 w-16" />
@@ -59,16 +59,16 @@ export default function DocumentView({ document }: DocumentViewProps) {
           <Skeleton className="h-4 w-36" />
         </div>
         
-        <div className="space-y-4">
-          <Skeleton className="h-6 w-1/2 mb-2" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-3/4" />
+        <div className="space-y-md">
+          <Skeleton className="h-6 w-1/2 mb-sm" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-3/4" />
           
-          <Skeleton className="h-6 w-1/2 mb-2" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-6 w-1/2 mb-sm" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-5/6" />
         </div>
       </div>
     );

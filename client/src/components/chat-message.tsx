@@ -15,18 +15,18 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   return (
     <div className={messageClass}>
       {isUserMessage ? (
-        <p>{content}</p>
+        <p className="text-body">{content}</p>
       ) : (
         <>
-          <p className={references && references.length > 0 ? "mb-2" : ""}>{content}</p>
+          <p className={references && references.length > 0 ? "mb-sm text-body" : "text-body"}>{content}</p>
           
           {references && references.length > 0 && (
-            <div>
+            <div className="mt-sm">
               {references.map((reference, index) => (
-                <div key={index} className="bg-neutral-50 p-3 rounded border-l-2 border-secondary-500 text-sm italic my-2">
+                <div key={index} className="document-highlight my-sm text-caption leading-body">
                   {reference.text}
                   {reference.location && (
-                    <div className="text-xs text-neutral-500 mt-1 not-italic">
+                    <div className="text-caption text-muted-foreground mt-xs font-medium">
                       {reference.location}
                     </div>
                   )}

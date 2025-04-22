@@ -21,12 +21,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-background">
       <Header />
       
       <div className="flex-1 overflow-hidden">
-        <div className="container mx-auto h-full px-4 py-4">
-          <div className="main-container flex h-full gap-4 md:flex-row flex-col">
+        <div className="container mx-auto h-full p-md md:p-lg">
+          <div className="main-container flex h-full gap-md md:flex-row flex-col">
             <DocumentPanel 
               document={currentDocument} 
               onDocumentUpload={handleDocumentUpload} 
