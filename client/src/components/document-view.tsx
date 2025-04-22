@@ -3,6 +3,17 @@ import { Document } from '@shared/schema';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 
+// Define document response shape
+interface DocumentResponse {
+  id: number;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  content: string;
+  metadata?: Record<string, any>;
+  uploadedAt: string;
+}
+
 interface DocumentViewProps {
   document: Document;
 }
@@ -11,7 +22,7 @@ export default function DocumentView({ document }: DocumentViewProps) {
   const [highlightedText, setHighlightedText] = useState<string[]>([]);
   
   // Fetch full document content
-  const { data: fullDocument, isLoading } = useQuery({
+  const { data: fullDocument, isLoading } = useQuery<DocumentResponse>({
     queryKey: [`/api/documents/${document.id}`],
     enabled: !!document.id,
   });
@@ -76,20 +87,20 @@ export default function DocumentView({ document }: DocumentViewProps) {
   
   const documentContent = fullDocument?.content || document.content || '';
   const formattedContent = formatDocumentContent(documentContent);
-  const metadata = fullDocument?.metadata || {};
+  const metadata = fullDocument?.metadata || {} as Record<string, any>;
   
   // Format the date from ISO string
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | Date) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
   
   return (
-    <div id="document-view" className="p-6">
-      <div className="mb-6">
-        <h2 className="text-lg font-bold text-neutral-800">{document.fileName}</h2>
-        <div className="flex items-center space-x-2 text-sm text-neutral-500">
+    <div id="document-view" className="p-md">
+      <div className="mb-md">
+        <h2 className="text-h3 font-semibold text-foreground">{document.fileName}</h2>
+        <div className="flex items-center space-x-xs text-caption text-muted-foreground">
           {metadata.pageCount && <span>{metadata.pageCount} {metadata.pageCount === 1 ? 'page' : 'pages'}</span>}
           {metadata.pageCount && <span>•</span>}
           <span>{document.fileType.split('/')[1].toUpperCase()}</span>
@@ -98,13 +109,13 @@ export default function DocumentView({ document }: DocumentViewProps) {
         </div>
       </div>
       
-      <div className="prose max-w-none">
+      <div className="prose prose-primary max-w-none">
         {formattedContent.map((section, index) => {
           if (section.isHeader) {
             return (
               <h3 
                 key={index}
-                className={section.isHighlighted ? "document-highlight" : ""}
+                className={section.isHighlighted ? "document-highlight font-semibold" : "font-semibold text-foreground"}
               >
                 {section.text}
               </h3>
@@ -113,9 +124,9 @@ export default function DocumentView({ document }: DocumentViewProps) {
             return (
               <div 
                 key={index}
-                className={section.isHighlighted ? "document-highlight my-4" : "my-4"}
+                className={section.isHighlighted ? "document-highlight my-sm" : "my-sm"}
               >
-                <p>{section.text}</p>
+                <p className="text-body text-foreground leading-body">{section.text}</p>
               </div>
             );
           }
